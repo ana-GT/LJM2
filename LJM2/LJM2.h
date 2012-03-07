@@ -112,6 +112,7 @@ class LJM2 {
 		void ProcessGeometry();
 
 		//-- DT Functions
+		void CalculateGeometricNeighbors();
 		void CalculateDT();
 		void CalculateDTSurface();
 		bool IsLocalMaxima( int _index );
@@ -162,7 +163,7 @@ class LJM2 {
 
 		void ViewBall( pcl::visualization::PCLVisualizer *_viewer, 
 					   int _x, int _y, int _z, std::string _name, 
-				       double _radius = 2.0, double _r = 1.0, double _g = 0.0, double _b = 0.0 );
+				       double _radius = 1.0, double _r = 1.0, double _g = 0.0, double _b = 0.0 );
 
 		//-- Geometry Helper  functions
 		void CreateExternalBoundary();
@@ -181,6 +182,7 @@ class LJM2 {
 		bool CheckCollision( int _x, int _y, int _z );
 		bool WorldToGrid( double _worldX, double _worldY, double _worldZ, int& _x, int& _y, int& _z ) const;
 		bool GridToWorld(int _x, int _y, int _z, double& _worldX, double& _worldY, double& _worldZ ) const;
+		std::vector< std::vector<Eigen::VectorXd> > NodePathToWorkspacePath( std::vector< std::vector<Eigen::Vector3i> > _nodePath );
 
 		//-- Stuff!
 		static const float LJM2_INF;

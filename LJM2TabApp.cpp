@@ -8,7 +8,7 @@
 
 /**
  * @author A. Huaman
- * @date 2011-12-06
+ * @date 2012-03-07
  */
 #include "GRIPApp.h"
 #include "LJM2Tab.h"

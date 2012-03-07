@@ -70,26 +70,46 @@ std::vector< std::vector<Eigen::Vector3i> > LJM2::FindVarietyPaths2( int _x1, in
         //ts = clock();
 		path = FindPath( startIndex, targetIndex );
         //tf = clock();
-        printf("--[%d] FindPath of size %d \n", i, path.size() ); 
+        printf("--[%d] Found Path of size %d \n", i, path.size() ); 
         //printf(" Time elapsed: %.3f  \n", (double) (tf - ts)/CLOCKS_PER_SEC );
 		paths.push_back( path );
 		nodePaths.push_back( mPath );
 
 		//-- Update the values
-        ts = clock();
-		ResetSearch();
-        tf = clock();
-        printf("--[%d] Research : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
-		allNodePaths = JoinPaths( nodePaths );
-        ts = clock();
-		UpdateNodeValues( allNodePaths ); 
-        tf = clock();
-        printf("--[%d] UpdateNodes : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
+        //ts = clock();
+		//ResetSearch();
+        //tf = clock();
+        //printf("--[%d] Research : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
+		//allNodePaths = JoinPaths( nodePaths );
+        //ts = clock();
+		//UpdateNodeValues( allNodePaths ); 
+        //tf = clock();
+        //printf("--[%d] UpdateNodes : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
 	}
 
 	return paths;
 }
 
+
+/**
+ * @function NodePathToWorkspacePath
+ */
+std::vector< std::vector<Eigen::VectorXd> > LJM2::NodePathToWorkspacePath( std::vector< std::vector<Eigen::Vector3i> > _nodePath ) {
+	
+	std::vector< std::vector<Eigen::VectorXd> > workspacePath;
+
+	for( size_t i = 0; i < _nodePath.size(); ++i ) {
+		std::vector<Eigen::VectorXd> path;
+		for( size_t j = 0; j < _nodePath[i].size(); ++j ) {
+			Eigen::VectorXd temp(3);
+			GridToWorld( _nodePath[i][j](0), _nodePath[i][j](1), _nodePath[i][j](2), temp(0), temp(1), temp(2) );
+			path.push_back( temp );			
+		}
+		workspacePath.push_back( path );
+	}	
+
+	return workspacePath;
+}
 
 /**
  * @function ShortestPath

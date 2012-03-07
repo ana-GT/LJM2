@@ -63,6 +63,8 @@ const int LJM2::NZ[26] = { 1, 1,1, 1,-1,-1,-1,-1, 0, 0,0, 0, 1, 1,1,1,-1,-1,-1,-
  */
 LJM2::LJM2( double _worldSizeX, double _worldSizeY, double _worldSizeZ, double _originX, double _originY, double _originZ, double _resolution ) {
 
+	printf("-------(...) Creating object LJM2 (...)-------\n");
+
 	//-- Geometry initialization
 	mWorldSizeX = _worldSizeX;
 	mWorldSizeY = _worldSizeY;
@@ -77,13 +79,13 @@ LJM2::LJM2( double _worldSizeX, double _worldSizeY, double _worldSizeZ, double _
 	mSizeY = (int) ((double) mWorldSizeY/mResolution);
 	mSizeZ = (int) ((double) mWorldSizeZ/mResolution);
 
-	printf("Size X,YZ: %d %d %d \n", mSizeX, mSizeY, mSizeZ );
+	printf("-------(i) Size XYZ: %d %d %d \n", mSizeX, mSizeY, mSizeZ );
 	mStride1 = mSizeY*mSizeZ;
 	mStride2 = mSizeZ;
 
 	mNumNodes = mSizeX*mSizeY*mSizeZ;
 
-    printf("Num nodes : %d \n", mNumNodes );
+    printf("-------(i) Num nodes : %d \n", mNumNodes );
 
 	mNodes = new Node3D[mNumNodes];
 	mGeometricNeighbors = new std::vector<int>[mNumNodes];
@@ -161,9 +163,24 @@ LJM2::~LJM2() {
  * @function ProcessGeometry
  */
 void LJM2::ProcessGeometry() {
-	printf("DT...\n");
-	CalculateDT();
-	CalculateDTSurface();
+    CalculateGeometricNeighbors();
+	//CalculateDT();
+	//CalculateDTSurface();
+}
+
+/**
+ * @function CalculateGeometricNeighbors
+ */
+void LJM2::CalculateGeometricNeighbors() {
+
+	printf( "------ (...) Getting Geometric Neighbors: (...)------ \n" );
+
+	for( size_t i = 0; i < mNumNodes; ++i ) {
+		mGeometricNeighbors[i] = GetGeometricNeighbors(i);
+	}
+	printf("-------(i) Gotten all of Geometric Neighbors (i) ------- \n");
+
+
 }
 
 /////////////////// DT Functions ///////////////////////////
@@ -173,16 +190,8 @@ void LJM2::ProcessGeometry() {
  */
 void LJM2::CalculateDT() {
 
-	printf( "... Getting Geometric Neighbors: \n" );
-	//printf("Num nodees :%d \n", mNumNodes);
-	for( size_t i = 0; i < mNumNodes; ++i ) {
-		//printf("Neighbors i: %d \n", i);
-		mGeometricNeighbors[i] = GetGeometricNeighbors(i);
-	}
-	printf("... Gotten all of Geometric Neighbors ... \n");
 
-
-	printf("... Calculating DT ...\n");
+	printf("-------(...) Calculating DT (...) -------\n");
 	std::vector<int> queue;
 
 	//-- 1. Initialize queue with obstacle grids and set distances to zero for them
@@ -528,6 +537,7 @@ void LJM2::ViewPaths( std::vector< std::vector<Eigen::Vector3i> > _paths, pcl::v
 
 /**
  * @function ViewBall
+ * @brief Draw a ball in the location specified
  */
 void LJM2::ViewBall( pcl::visualization::PCLVisualizer *_viewer, int _x, int _y, int _z, std::string _name, double _radius, double _r, double _g, double _b ) {
 

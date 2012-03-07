@@ -1,5 +1,44 @@
+/*
+ * Copyright (c) 2012, Georgia Tech Research Corporation
+ * All rights reserved	
+ * Author(s): Ana C. Huaman Quispe <ahuaman3@gatech.edu>
+ * Georgia Tech Humanoid Robotics Lab
+ * Under direction of Prof. Mike Stilman <mstilman@cc.gatech.edu>
+ *
+ * This file is provided under the following "BSD-style" License:
+ *
+ *
+ *   Redistribution and use in source and binary forms, with or
+ *   without modification, are permitted provided that the following
+ *   conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *
+ *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ *   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ *   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ *   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ *   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ *   USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *   AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *   ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *   POSSIBILITY OF SUCH DAMAGE.
+ *
+ */	
+
 /**
  * @function CheckProcess.cpp
+ * @dat 2012-03-07
  */
 #include "CheckProcess.h"
 
@@ -66,14 +105,27 @@ void CheckProcess::build_slideBox()
  * @function getObjectsData
  * @brief Copy the information of the world objects in our class
  */
-void CheckProcess::getObjectsData( std::vector<planning::Object*> _objects )
+void CheckProcess::getObjectsData( std::vector<planning::Object*> _objects, std::string _objectNoIncludedName )
 {
-  mNumObjs = _objects.size();
-  mObjs.resize( mNumObjs );
+  mObjectNoIncludedName = _objectNoIncludedName;
+  
+  mObjs.resize( 0 );
+  mObjNames.resize( 0 );
+
+  mNumObjs = 0;
 
   //-- NOTICE! Each object has only one model (my ASSUMPTION)
-  for( int i = 0; i < mNumObjs; i++ )
-  { mObjs[i].getModelData( _objects[i]->mModels[0] ); }
+  for( int i = 0; i < _objects.size(); i++ )
+  { 
+	if( _objects[i]->getName() != mObjectNoIncludedName ) {
+		printf("-------(i) Getting info from %s \n", _objects[i]->getName().c_str() );
+		CheckObject obj;
+		obj.getModelData( _objects[i]->mModels[0] ); 
+        mObjs.push_back(obj);
+	    mObjNames.push_back( _objects[i]->getName() );
+		mNumObjs++;
+	}
+  }
 }  
 
 /**
@@ -119,43 +171,54 @@ void CheckProcess::build_voxel( std::vector<planning::Object*> _objects, LJM2 &_
 
    //ts = clock();
    //-- For each object
-   for( int k = 0; k < mNumObjs; k++ )
-   {
-      // Each object has only one node, so get node 0 do it
-      mObjs[k].updateObjectData( _objects[k]->getNode(0) );
+   for( int i = 0; i < mObjs.size(); ++i ) {
+   	   for( int k = 0; k < _objects.size(); k++ )
+   	   {
+   	   		if( mObjNames[i] == _objects[k]->getName() ) {
+      	   		// Each object has only one node, so get node 0 do it
+      			mObjs[i].updateObjectData( _objects[k]->getNode(0) );
 
-      //-- Convert to voxel grid
-      _ljm2.WorldToGrid( mObjs[k].min_x, mObjs[k].min_y, mObjs[k].min_z, mObjs[k].minCell_x, mObjs[k].minCell_y, mObjs[k].minCell_z );
-      _ljm2.WorldToGrid( mObjs[k].max_x, mObjs[k].max_y, mObjs[k].max_z, mObjs[k].maxCell_x, mObjs[k].maxCell_y, mObjs[k].maxCell_z );
+	      		//-- Convert to voxel grid
+    	  		_ljm2.WorldToGrid( mObjs[i].min_x, mObjs[i].min_y, mObjs[i].min_z, mObjs[i].minCell_x, mObjs[i].minCell_y, mObjs[i].minCell_z );
+    	  		_ljm2.WorldToGrid( mObjs[i].max_x, mObjs[i].max_y, mObjs[i].max_z, mObjs[i].maxCell_x, mObjs[i].maxCell_y, mObjs[i].maxCell_z );
 
-      //-- 
-      double idt[3][3];
-      idt[0][0] = 1; idt[0][1] = 0; idt[0][2] = 0;
-      idt[1][0] = 0; idt[1][1] = 1; idt[1][2] = 0;
-      idt[2][0] = 0; idt[2][1] = 0; idt[2][2] = 1;
+    	  		printf(" --(i) Building voxel (%s): \n", mObjNames[i].c_str() );
+    	  		printf( "* Min XYZ World: %f %f %f Min XYZ Cell: %d %d %d \n", mObjs[i].min_x, mObjs[i].min_y, mObjs[i].min_z, mObjs[i].minCell_x, mObjs[i].minCell_y, mObjs[i].minCell_z );
+    	  	printf( "* Max XYZ World: %f %f %f Max XYZ Cell: %d %d %d \n", mObjs[i].max_x, mObjs[i].max_y, mObjs[i].max_z, mObjs[i].maxCell_x, mObjs[i].maxCell_y, mObjs[i].minCell_z );
+
+    	  		//-- 
+    	  		double idt[3][3];
+    	  		idt[0][0] = 1; idt[0][1] = 0; idt[0][2] = 0;
+    	 		idt[1][0] = 0; idt[1][1] = 1; idt[1][2] = 0;
+    	  		idt[2][0] = 0; idt[2][1] = 0; idt[2][2] = 1;
   
-      double tt[3]; 
+		      	double tt[3]; 
 
-      //-- Building the voxel grid, sliding the basic box
-      for( int i = mObjs[k].minCell_x; i <= mObjs[k].maxCell_x; i++ )
-       { for( int j = mObjs[k].minCell_y; j <= mObjs[k].maxCell_y; j++ )
-         { for( int q = mObjs[k].minCell_z; q <= mObjs[k].maxCell_z; q++ )
-           { 
-             _ljm2.GridToWorld( i, j, q, tt[0], tt[1], tt[2] ); 
-             RAPID_Collide( mObjs[k].R, mObjs[k].T, mObjs[k].rapidObject, idt, tt, mSlideBox, RAPID_FIRST_CONTACT );
-             if( RAPID_num_contacts != 0)
-              { 
-				 if( _ljm2.IsValid(i,j,q) == false ) {
-					printf("--(!) Error here, no valid obstacle voxel (%d %d %d)! \n", i,j,q );
-				 }
-				_ljm2.SetState( i, j, q, OBSTACLE_STATE );
-                mObjsVoxels.push_back( Eigen::Vector3i( i, j, q ) );
-              }
-           } 
-         }
-       }
+    		  	//-- Building the voxel grid, sliding the basic box
+    		  	for( int m = mObjs[i].minCell_x; m <= mObjs[i].maxCell_x; m++ )
+    		   	{ for( int n = mObjs[i].minCell_y; n <= mObjs[i].maxCell_y; n++ )
+    		     	{ for( int p = mObjs[i].minCell_z; p <= mObjs[i].maxCell_z; p++ )
+    		       		{ 
+    		         		_ljm2.GridToWorld( m, n, p, tt[0], tt[1], tt[2] ); 
+    		         		RAPID_Collide( mObjs[i].R, mObjs[i].T, mObjs[i].rapidObject, idt, tt, mSlideBox, RAPID_FIRST_CONTACT );
+    		         		if( RAPID_num_contacts != 0)
+    		          		{ 
+						 		if( _ljm2.IsValid(m, n, p) == false ) {
+									printf("--(!) Error here, no valid obstacle voxel (%d %d %d)! \n", m, n, p );
+						 		}
+								_ljm2.SetState( m, n, p, OBSTACLE_STATE );
+    	            			mObjsVoxels.push_back( Eigen::Vector3i( m, n, p ) );
+    	          			}
+    	       			} 
+    	     		}
+    	   		}
 
-   } //-- End of objects
+				break; // Got the corresponding object, go to the following one
+			} // end of if
+
+		} // end of for _objects
+
+   } //-- End of mObjs
 
   //tf = clock();
   //dt = (double) ( tf - ts )/CLOCKS_PER_SEC; 
@@ -171,8 +234,8 @@ void CheckProcess::build_voxel( std::vector<planning::Object*> _objects, LJM2 &_
 void CheckProcess::reportObjects()
 {
   for( int i = 0; i < mNumObjs; i++ )
-  { printf( " Object [%d]: center: ( %.3f,%.3f, %.3f ) -- radius: ( %.3f, %.3f, %.3f ) \n", 
-	      i, mObjs[i].center[0], mObjs[i].center[1], mObjs[i].center[2], mObjs[i].radius[0], mObjs[i].radius[1], mObjs[i].radius[2] ); }
+  { printf( " Object [%d] %s : center: ( %.3f,%.3f, %.3f ) -- radius: ( %.3f, %.3f, %.3f ) \n", i, mObjNames[i].c_str(), mObjs[i].center[0], mObjs[i].center[1], mObjs[i].center[2], mObjs[i].radius[0], mObjs[i].radius[1], mObjs[i].radius[2] );
+  }
 }
 
 

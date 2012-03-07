@@ -36,8 +36,8 @@ enum LJM2TabEvents {
 	button_ShowTargetPose,
 
     button_Get3DInfo,
-	button_PlotObstacles,
-	button_Plot3,
+	button_Plot3DConfiguration,
+	button_Plot3DPaths,
 
 	button_Plan,
 	button_Stop,
@@ -78,9 +78,9 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
     mLinks.resize(0);
 
 	mSizeX = 0.80;
-	mSizeY = 0.80;
+	mSizeY = 1.00;
     mSizeZ = 1.0;
-    mResolution = 0.01;
+    mResolution = 0.02;
     mOriginX = 0.0;
     mOriginY = -0.10; 
     mOriginZ = 0.20;
@@ -139,11 +139,11 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
 
-    col4Sizer->Add( new wxButton(this, button_PlotObstacles, wxT("Plot 3D Info")),
+    col4Sizer->Add( new wxButton(this, button_Plot3DConfiguration, wxT("Plot 3D Info")),
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
-    col4Sizer->Add( new wxButton(this, button_Plot3, wxT("Plot 3")),
+    col4Sizer->Add( new wxButton(this, button_Plot3DPaths, wxT("Plot 3D Paths")),
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
@@ -321,7 +321,7 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
 
           if( mWorld != NULL )
           {  if( mWorld->mRobots.size() < 1 )
-             {  printf("No robot in the loaded world, you need one! \n"); break; }
+             {  printf("---------(xx) No robot in the loaded world, you idiot, I need one! (xx)---------- \n"); break; }
  
              if( selectedObject != NULL )
              { 
@@ -341,19 +341,19 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
 		break;
 
 
-        /** Plot 1 */
+        /** Get 3D Info */
 	      case button_Get3DInfo:
           {
 			Get3DInfo();
           }		
 	          break;
 
-        /** Plot 2 */
-	      case button_PlotObstacles:
+        /** Plot 3D Configuration */
+	      case button_Plot3DConfiguration:
           {
-			printf( " Plotting Obstacles \n" );
+			printf( "--------- Plotting 3D Configuration ---------- \n" );
 	        pcl::visualization::PCLVisualizer *viewer;
-			viewer = new pcl::visualization::PCLVisualizer( "View Obstacles" );
+			viewer = new pcl::visualization::PCLVisualizer( "Discretized Workspace" );
 
 			mLjm2->ViewObstacles( viewer, 0, 0, 255 );
 
@@ -364,16 +364,27 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
           }		
 	          break;
 
-        /** Plot 3 */
-	      case button_Plot3:
+        /** Plot Paths */
+	      case button_Plot3DPaths:
           {
+			printf( "--------- Plotting 3D Paths ---------- \n" );
+	        pcl::visualization::PCLVisualizer *viewer;
+			viewer = new pcl::visualization::PCLVisualizer( "Workspace Paths" );
+			mLjm2->ViewObstacles( viewer, 0, 0, 255 );
+			mLjm2->ViewPaths( mNodePaths, viewer );
+            mLjm2->ViewBall( viewer, mStartNodeX, mStartNodeY, mStartNodeZ, "Start" );
+            mLjm2->ViewBall( viewer, mTargetNodeX, mTargetNodeY, mTargetNodeZ, "Target" );
 
+   	        while( !viewer->wasStopped() ) {
+		    	viewer->spin();
+	        }
+           delete viewer;
           }		
 	          break;
 
         
 
-        /** UpdateTime (?) */
+        /** UpdateTime */
 	      case button_UpdateTime:
           {
 	          /// Update the time span of the movie timeline
@@ -423,19 +434,19 @@ void LJM2Tab::WorkspacePlan() {
 
   
    if( mLjm2->WorldToGrid( mStartXYZ(0), mStartXYZ(1), mStartXYZ(2), mStartNodeX, mStartNodeY, mStartNodeZ ) == false )
-   {  printf("--(!) Error -- No Start Cell in Voxel \n"); } 
+   {  printf("-------(x) Error: Start Position no valid (off limits) (x)-------\n"); return; } 
    if( mLjm2->WorldToGrid( mTargetXYZ(0), mTargetXYZ(1), mTargetXYZ(2), mTargetNodeX, mTargetNodeY, mTargetNodeZ ) == false )
-   {  printf("--(!) Error -- No Target Cell in Voxel \n"); }    
+   {  printf("-------(x) Error: Target Position no valid (off limits) (x)-------\n"); return; }    
 
 
 	//-- Plan now workspace guys
-	mNumPaths = 2;
+	mNumPaths = 1;
 	mAlpha = 0.01;
-	printf("From (%d %d %d) to (%d %d %d) \n", mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ );
-	printf("State of the nodes: %d %d \n", mLjm2->GetState(mStartNodeX, mStartNodeY, mStartNodeZ), mLjm2->GetState(mTargetNodeX, mTargetNodeY, mTargetNodeZ));
-	mWorkspacePaths = mLjm2->FindVarietyPaths2( mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ, mNumPaths, mAlpha );
-
-	printf("Done! \n");
+	printf("-------(o) Planning from (%d %d %d) to (%d %d %d) (o)-------\n", mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ );
+	printf("-------(o) Start State: %d  Target state: %d (FREE: 1 OBSTACLE: 2) (o)-------\n", mLjm2->GetState(mStartNodeX, mStartNodeY, mStartNodeZ), mLjm2->GetState(mTargetNodeX, mTargetNodeY, mTargetNodeZ));
+	mNodePaths = mLjm2->FindVarietyPaths2( mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ, mNumPaths, mAlpha );
+	mWorkspacePaths = mLjm2->NodePathToWorkspacePath( mNodePaths );
+	printf("-------(i) Finished Workpace Planning (i)------- \n");
 }
 
 /*
@@ -458,15 +469,16 @@ Eigen::VectorXd LJM2Tab::GetEE_XYZ( const Eigen::VectorXd &_q ) {
 void LJM2Tab::Get3DInfo() {
 
   //-- Build voxel - LJM2 object
-  printf("Getting Info 3D \n" );
+  printf("------- Getting Info 3D -------\n" );
+  printf("--(!) You'd better have set the start config and the target object, otherwise I will output rubbish \n");
   mLjm2 = new LJM2( mSizeX, mSizeY, mSizeZ, mOriginX, mOriginY, mOriginZ, mResolution );
   mCp = new CheckProcess( mSizeX, mSizeY, mSizeZ, mOriginX, mOriginY, mOriginZ, mResolution );
-  mCp->getObjectsData( mWorld->mObjects );
-  mCp->reportObjects();   
+  mCp->getObjectsData( mWorld->mObjects, mTargetName );  
   mCp->build_voxel( mWorld->mObjects, *mLjm2 ); // Here your LJM2 is built
-  printf("...Process Geometry... \n");
+  mCp->reportObjects(); 
+  printf("----- (...) Process Geometry (...) ----- \n");
   mLjm2->ProcessGeometry();
-  printf("End process geometry \n");
+  printf("----- (i) End process geometry (i) ----- \n");
 }
 
 
