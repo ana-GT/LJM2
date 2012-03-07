@@ -46,6 +46,8 @@ enum LJM2TabEvents {
 	button_ExportSequence,
 	button_ShowPath,
 	slider_Time,
+	slider_Alpha,
+    slider_NumPaths
 
 };
 
@@ -110,6 +112,13 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
 		    1 ); // set border width to 1, so start buttons are close together
 
     // Add col1Sizer to the configuration box
+	mAlphaSlider = new GRIPSlider( "Alpha", 0.0, 1.0, 50, 0.01, 10, 50, this, slider_Alpha ); 
+    col1Sizer->Add( mAlphaSlider, 1, wxEXPAND | wxALL, 3 );
+
+	mNumPathsSlider = new GRIPSlider( "Num Paths", 1, 10, 10, 2, 1, 10, this, slider_NumPaths ); 
+    col1Sizer->Add( mNumPathsSlider, 1, wxEXPAND | wxALL, 3 );
+
+    
     configureBoxSizer->Add( col1Sizer,
 			    1, // takes half the space of the configure box
 			    wxALIGN_NOT ); // no border and center horizontally
@@ -462,10 +471,12 @@ void LJM2Tab::WorkspacePlan() {
 
 
 	//-- Plan now workspace guys
-	mNumPaths = 2;
-	mAlpha = 0.01;
 	printf("-------(o) Planning from (%d %d %d) to (%d %d %d) (o)-------\n", mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ );
 	printf("-------(o) Start State: %d  Target state: %d (FREE: 1 OBSTACLE: 2) (o)-------\n", mLjm2->GetState(mStartNodeX, mStartNodeY, mStartNodeZ), mLjm2->GetState(mTargetNodeX, mTargetNodeY, mTargetNodeZ));
+
+	//-- Check alpha and numPaths
+	printf("---(i) Search Parameters: Alpha: %.3f - Num Paths: %d \n", mAlpha, mNumPaths );
+
 	mNodePaths = mLjm2->FindVarietyPaths2( mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ, mNumPaths, mAlpha );
 	mWorkspacePaths = mLjm2->NodePathToWorkspacePath( mNodePaths );
 	printf("-------(i) Finished Workpace Planning (i)------- \n");
@@ -526,6 +537,16 @@ void LJM2Tab::OnSlider(wxCommandEvent &evt) {
 	          std::cout << "-->(i) Timeline slider output: " << numBuf << std::endl;
 	          //handleTimeSlider(); // uses slider position to query plan state
 	          break;
+
+		case slider_Alpha:
+	          sprintf(numBuf, "Alpha: %7.4f", pos);
+			  mAlpha = pos;	
+			  break;
+
+		case slider_NumPaths:
+	          sprintf(numBuf, "Num Paths: %d", (int)pos);
+			  mNumPaths = (int) pos;	
+			  break;
 
       	default:
 	          return;

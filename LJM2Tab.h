@@ -143,6 +143,10 @@ public:
     // void Thread();
     // void onCompleteThread();
 
+	//-- Objects to enter Planning information
+	GRIPSlider* mAlphaSlider;
+    GRIPSlider* mNumPathsSlider; 
+
     DECLARE_DYNAMIC_CLASS( LJM2Tab )
     DECLARE_EVENT_TABLE()
 };
