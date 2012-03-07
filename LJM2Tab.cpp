@@ -462,7 +462,7 @@ void LJM2Tab::WorkspacePlan() {
 
 
 	//-- Plan now workspace guys
-	mNumPaths = 1;
+	mNumPaths = 2;
 	mAlpha = 0.01;
 	printf("-------(o) Planning from (%d %d %d) to (%d %d %d) (o)-------\n", mStartNodeX, mStartNodeY, mStartNodeZ, mTargetNodeX, mTargetNodeY, mTargetNodeZ );
 	printf("-------(o) Start State: %d  Target state: %d (FREE: 1 OBSTACLE: 2) (o)-------\n", mLjm2->GetState(mStartNodeX, mStartNodeY, mStartNodeZ), mLjm2->GetState(mTargetNodeX, mTargetNodeY, mTargetNodeZ));
