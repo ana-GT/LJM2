@@ -133,9 +133,9 @@ void CheckObject::updateObjectData( kinematics::BodyNode* _node )
 
   Eigen::Vector3d trans; 
   trans(0) = tf(0,3); trans(1) = tf(1,3); trans(2) = tf(2,3); 
-  std::cout << trans << std::endl; 
+  std::cout << "* Translation Mx: " << trans.transpose() << std::endl; 
   Eigen::Matrix3d rot = tf.topLeftCorner(3,3);
-  std::cout << rot << std::endl;
+  std::cout << "* Rotation Mx: \n" << rot << std::endl;
 
   //-- Save it properly
   for( int j = 0; j < 3; j++ )

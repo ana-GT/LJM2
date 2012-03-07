@@ -164,7 +164,7 @@ LJM2::~LJM2() {
  */
 void LJM2::ProcessGeometry() {
     CalculateGeometricNeighbors();
-	//CalculateDT();
+	CalculateDT();
 	//CalculateDTSurface();
 }
 
@@ -457,6 +457,39 @@ void LJM2::ViewDTSurface( pcl::visualization::PCLVisualizer *_viewer,
 	pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> DTSurfaceColor( DTSurfaceCloud, _r, _g, _b );
 
 	_viewer->addPointCloud<pcl::PointXYZ>( DTSurfaceCloud, DTSurfaceColor, "DT Surface Cloud" );
+
+}
+
+/**
+ * @function ViewBlameDTPoints
+ * @brief Visualize the points with DistBrush max (something wrong there)
+ */
+void LJM2::ViewBlameDTPoints( pcl::visualization::PCLVisualizer *_viewer,
+	   	  		         int _r, int _g, int _b ) {
+
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr BlameCloud( new pcl::PointCloud<pcl::PointXYZ> );
+
+	BlameCloud->height = 1;
+	BlameCloud->is_dense = false;
+	BlameCloud->points.resize( 0 );
+		
+	int cont = 0;
+	for( int i = 0; i < mNumNodes; ++i ) {
+		pcl::PointXYZ q;
+		if( mNodes[i].s.brushDist == LJM2_INF ) {
+			q.x = mNodes[i].x; 
+			q.y = mNodes[i].y; 
+			q.z = mNodes[i].z;					
+			BlameCloud->points.push_back(q);  
+			cont++;
+		}     
+	}
+
+	printf("--(i) Num Points to blame ( DistBrush = MAX ) = %d \n", cont );
+	pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> BlameColor( BlameCloud, _r, _g, _b );
+
+	_viewer->addPointCloud<pcl::PointXYZ>( BlameCloud, BlameColor, "Blame Cloud" );
 
 }
 

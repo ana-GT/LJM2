@@ -38,6 +38,7 @@ enum LJM2TabEvents {
     button_Get3DInfo,
 	button_Plot3DConfiguration,
 	button_Plot3DPaths,
+	button_PlotDebug,
 
 	button_Plan,
 	button_Stop,
@@ -83,7 +84,7 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
     mResolution = 0.02;
     mOriginX = 0.0;
     mOriginY = -0.10; 
-    mOriginZ = 0.20;
+    mOriginZ = 0.0;
 
     mEEName = "LJ6";
 
@@ -144,6 +145,10 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
     col4Sizer->Add( new wxButton(this, button_Plot3DPaths, wxT("Plot 3D Paths")),
+		    0, // make horizontally unstretchable
+		    wxALL, // make border all around (implicit top alignment)
+		    1 ); // set border width to 1, so start buttons are close together
+    col4Sizer->Add( new wxButton(this, button_PlotDebug, wxT("Plot Debug")),
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
@@ -382,7 +387,24 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
           }		
 	          break;
 
-        
+		/** Plot Debug */
+		case button_PlotDebug:
+		{
+			printf("------- Plot Debugger ------- \n");
+	        pcl::visualization::PCLVisualizer *viewer;
+			viewer = new pcl::visualization::PCLVisualizer( "Debugger" );
+			mLjm2->ViewObstacles( viewer, 0, 0, 255 );
+			mLjm2->ViewPaths( mNodePaths, viewer );
+            mLjm2->ViewBall( viewer, mStartNodeX, mStartNodeY, mStartNodeZ, "Start" );
+            mLjm2->ViewBall( viewer, mTargetNodeX, mTargetNodeY, mTargetNodeZ, "Target" );
+            mLjm2->ViewBlameDTPoints( viewer, 0, 255, 0 );
+
+   	        while( !viewer->wasStopped() ) {
+		    	viewer->spin();
+	        }
+           delete viewer;
+		}
+        	break;
 
         /** UpdateTime */
 	      case button_UpdateTime:

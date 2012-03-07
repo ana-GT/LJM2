@@ -157,6 +157,9 @@ class LJM2 {
 		void ViewDTSurface( pcl::visualization::PCLVisualizer *_viewer,
 					        int _r = 255, int _g = 0, int _b = 0 );
 
+		void ViewBlameDTPoints( pcl::visualization::PCLVisualizer *_viewer,
+	   	 		    		    int _r, int _g, int _b );
+
 		void ViewPath( std::vector<Eigen::Vector3i> _path, pcl::visualization::PCLVisualizer *_viewer,
 					   int _r = 255, int _g = 255, int _b = 0 );
 		void ViewPaths( std::vector< std::vector<Eigen::Vector3i> > _paths, pcl::visualization::PCLVisualizer *_viewer );

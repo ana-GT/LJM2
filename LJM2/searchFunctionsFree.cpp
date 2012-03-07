@@ -77,12 +77,12 @@ std::vector< std::vector<Eigen::Vector3i> > LJM2::FindVarietyPaths2( int _x1, in
 
 		//-- Update the values
         //ts = clock();
-		//ResetSearch();
+		ResetSearch();
         //tf = clock();
-        //printf("--[%d] Research : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
-		//allNodePaths = JoinPaths( nodePaths );
-        //ts = clock();
-		//UpdateNodeValues( allNodePaths ); 
+        //printf("--[%d] Search : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
+		allNodePaths = JoinPaths( nodePaths );
+        ts = clock();
+		UpdateNodeValues( allNodePaths ); 
         //tf = clock();
         //printf("--[%d] UpdateNodes : Time elapsed: %.3f  \n", i, (double) (tf - ts)/CLOCKS_PER_SEC );
 	}

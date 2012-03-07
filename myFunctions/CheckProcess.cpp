@@ -97,6 +97,12 @@ void CheckProcess::build_slideBox()
   mSlideBox->AddTri( p1, p6, p5, 10 );
   mSlideBox->AddTri( p1, p6, p2, 11 );
   //-- Should we add more inner triangles here?
+  //-- Added : 2012-03-07
+  mSlideBox->AddTri( p0, p1, p6, 12 );  // Diagonal 
+  mSlideBox->AddTri( p0, p6, p7, 13 );  // Diagonal
+  mSlideBox->AddTri( p3, p4, p5, 14 );  // Diagonal 
+  mSlideBox->AddTri( p2, p4, p5, 15 );  // Diagonal
+
   mSlideBox->EndModel();
 
 }
