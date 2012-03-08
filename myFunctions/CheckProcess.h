@@ -86,7 +86,7 @@ class CheckProcess
   void reportObjects();
 
   //-- Voxel construction
-  void build_voxel( std::vector<planning::Object*> _objects, LJM2 &_ljm2 );
+  void build_voxel( std::vector<planning::Object*> _objects, LJM2 &_ljm2, int _inflated = 0 );
 
   //-- Distance transform 
   std::vector< Eigen::Vector3i >mObjsVoxels;

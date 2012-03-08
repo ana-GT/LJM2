@@ -89,6 +89,7 @@ public:
 	std::vector< std::vector<Eigen::VectorXd> > mConfigPaths;
 	int mNumPaths;
 	double mAlpha;
+	int mInflated;
 
 	static int mPathCounter;
 

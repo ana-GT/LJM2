@@ -90,6 +90,8 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
     mOriginY = -0.10; 
     mOriginZ = 0.0;
 
+	mInflated = 3;
+
     mEEName = "LJ6";
 
     sizerFull = new wxBoxSizer( wxHORIZONTAL );
@@ -530,7 +532,7 @@ void LJM2Tab::Get3DInfo() {
   mLjm2 = new LJM2( mSizeX, mSizeY, mSizeZ, mOriginX, mOriginY, mOriginZ, mResolution );
   mCp = new CheckProcess( mSizeX, mSizeY, mSizeZ, mOriginX, mOriginY, mOriginZ, mResolution );
   mCp->getObjectsData( mWorld->mObjects, mTargetName );  
-  mCp->build_voxel( mWorld->mObjects, *mLjm2 ); // Here your LJM2 is built
+  mCp->build_voxel( mWorld->mObjects, *mLjm2, mInflated ); // Here your LJM2 is built
   mCp->reportObjects(); 
   printf("----- (...) Process Geometry (...) ----- \n");
   mLjm2->ProcessGeometry();

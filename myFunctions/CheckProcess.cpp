@@ -170,7 +170,7 @@ void CheckProcess::getLinksData( planning::Robot* _robot, Eigen::VectorXi _links
  * @function build_voxel
  * @brief Collision quick checking
  */
-void CheckProcess::build_voxel( std::vector<planning::Object*> _objects, LJM2 &_ljm2 )
+void CheckProcess::build_voxel( std::vector<planning::Object*> _objects, LJM2 &_ljm2, int _inflated )
 {
    //time_t ts; time_t tf; double dt;
    mObjsVoxels.clear();
@@ -213,6 +213,19 @@ void CheckProcess::build_voxel( std::vector<planning::Object*> _objects, LJM2 &_
 									printf("--(!) Error here, no valid obstacle voxel (%d %d %d)! \n", m, n, p );
 						 		}
 								_ljm2.SetState( m, n, p, OBSTACLE_STATE );
+								//-- Set Inflated, if indicated
+								if( _inflated > 0 ) {
+									for( int xi = m - _inflated; xi <=  m + _inflated; ++xi ) {
+										for( int yi = n - _inflated; yi <=  n + _inflated; ++yi ) {
+											for( int zi = p - _inflated; zi <=  p + _inflated; ++zi ) {
+												if ( _ljm2.IsValid( xi, yi, zi ) == false ) { continue; }
+												if( _ljm2.GetState( xi, yi, zi ) == FREE_STATE ) {
+													_ljm2.SetState( xi, yi, zi, INFLATED_STATE );
+												}
+											}
+										}
+									}
+								}
     	            			mObjsVoxels.push_back( Eigen::Vector3i( m, n, p ) );
     	          			}
     	       			} 

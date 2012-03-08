@@ -57,7 +57,8 @@
 /** State Enum */
 enum {
 	FREE_STATE = 1,
-	OBSTACLE_STATE = 2
+	OBSTACLE_STATE = 2,
+    INFLATED_STATE = 3
 };
 
 /** Status Enum */

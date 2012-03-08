@@ -296,7 +296,7 @@ void LJM2::CalculateDistanceFromPathSet( std::vector<int> _path ) {
 	//-- 1. Initialize all to infinity
 	for( int i = 0; i < mNumNodes; ++i ) {
 		
-		if( GetState( i ) == OBSTACLE_STATE ) {
+		if( GetState( i ) == OBSTACLE_STATE || GetState( i ) == INFLATED_STATE ) {
 			mNodes[i].s.brushDist = 0;
 		}
 
