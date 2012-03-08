@@ -27,6 +27,7 @@ using namespace std;
  * 1- Copy template cpp and header files and replace with new class name
  * 2- include classname.h in AllTabs.h, and use the ADD_TAB macro to create it
  */
+int LJM2Tab::mPathCounter = 0;
 
 // Control IDs (used for event handling - be sure to start with a non-conflicted id)
 enum LJM2TabEvents {
@@ -196,7 +197,7 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
     timeSizer->Add(new wxButton(this, button_UpdateTime, wxT("Set T(s)")),2,wxALL,1);
     executeBoxSizer->Add(timeSizer,1,wxALL,2);
 
-    executeBoxSizer->Add( new wxButton(this, button_ShowPath, wxT("&Print")),
+    executeBoxSizer->Add( new wxButton(this, button_ShowPath, wxT("&Show")),
 			  1, // stretch to fit horizontally
 			  wxGROW );
 
@@ -429,8 +430,11 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
 	              cout << "--(!) Must create a valid plan before printing. (!)--" << endl;
 		            return;
 	          } else {
-                printf("--(i) Printing (i)-- \n");
-              }        
+				printf("---Showing Path ----\n");
+	            mPathCounter++;
+				mPathCounter = mPathCounter % mNumPaths;
+                printf(" Executing path %d \n", mPathCounter );
+			    SetTimeline( mConfigPaths[mPathCounter] );              }        
 		  }
 	        break;
 
@@ -443,7 +447,6 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
         /** Execute Follow */
 		  case button_Follow: {
 		  	FollowWorkspacePlan();
-			SetTimeline( mConfigPaths[0] );
 		  }
 		  break;
 

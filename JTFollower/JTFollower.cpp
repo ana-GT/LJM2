@@ -67,7 +67,7 @@ std::vector< Eigen::VectorXd > JTFollower::PlanPath( int _robotId,
 	mLinks = _links;
 
     mMaxIter = 100;
-    mWorkspaceThresh = 0.01; // An error of 0.005 per coordinate
+    mWorkspaceThresh = 0.02; // An error of 0.005 per coordinate
     mEENode = mWorld->mRobots[mRobotId]->getNode( "LJ6" );
     mEEId = mEENode->getSkelIndex();
 

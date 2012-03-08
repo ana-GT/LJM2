@@ -368,8 +368,8 @@ void LJM2::UpdateNodeValues( std::vector<int> _path ) {
 
 	//-- Update accordingly
 	for( int i = 0; i < mNumNodes; ++i ) {
-		//mNodes[i].s.value = ( maxBrushDist - mNodes[i].s.brushDist );
-        mNodes[ i ].s.value = ( maxBrushDist - mNodes[ i ].s.brushDist )/mMaxBrushDist;
+		mNodes[i].s.value = ( maxBrushDist - mNodes[i].s.brushDist );
+        //mNodes[ i ].s.value = ( maxBrushDist - mNodes[ i ].s.brushDist )/mMaxBrushDist;
 	}
 
 }

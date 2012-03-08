@@ -90,6 +90,8 @@ public:
 	int mNumPaths;
 	double mAlpha;
 
+	static int mPathCounter;
+
 
     /// Miscellaneous stuff ( no idea why this is here )
     wxTextCtrl *timeText;

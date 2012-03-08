@@ -70,7 +70,7 @@ public:
     JTFollower( planning::World &_world,
 				Collision *_collision,
                 bool _copyWorld = false,
-                double _configStep = 0.12 ); // 0.046 is 1
+                double _configStep = 0.1 ); // 0.046 is 1
 
     /// Destructor
     ~JTFollower();
