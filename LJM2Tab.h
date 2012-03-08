@@ -86,6 +86,7 @@ public:
 
 	std::vector< std::vector<Eigen::VectorXd> > mWorkspacePaths;
 	std::vector< std::vector<Eigen::Vector3i> > mNodePaths;
+	std::vector< std::vector<Eigen::VectorXd> > mConfigPaths;
 	int mNumPaths;
 	double mAlpha;
 
@@ -116,10 +117,11 @@ public:
 
 	//-- Workspace functions
 	void WorkspacePlan(); 
+	void FollowWorkspacePlan(); 
 	Eigen::VectorXd GetEE_XYZ( const Eigen::VectorXd &_q );
 
 
-    void SetTimeline( std::list<Eigen::VectorXd> _path );
+    void SetTimeline( std::vector<Eigen::VectorXd> _path );
     void GRIPStateChange();
 
 	void Get3DInfo();

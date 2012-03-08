@@ -27,10 +27,13 @@ set( SRC_MY_FUNCTIONS myFunctions/CheckObject.cpp
 set( HDR_MY_FUNCTIONS myFunctions/CheckObject.h
 					  myFunctions/CheckProcess.h )
 
+set( SRC_JT JTFollower/JTFollower.cpp )
+set( HDR_JT JTFollower/JTFollower.h )
+
 set( SRC_LJM2 LJM2/LJM2.cpp 
 	 		  LJM2/searchFunctionsFree.cpp
 			  LJM2/searchFunctionsSurface.cpp
-			  LJM2/kdtree/kdtree.c )
+			  kdtree/kdtree.c )
 
 set( HDR_LJM2 LJM2/LJM2.h )
 
@@ -46,7 +49,7 @@ if (wxWidgets_FOUND)
   include_directories(${DART_HEADERS} ${GRIP_HEADERS} ${WXWIDGETS_SHARED_INCLUDE_DIRS})
   link_directories(${CMAKE_SOURCE_DIR}/lib ${GRIP_LIBDIR} ${WXWIDGETS_SHARED_LIBRARY_DIRS} )
 
-  add_executable ( LJM2Tab ${SRC_FILES} ${SRC_MY_FUNCTIONS} ${SRC_LJM2} ${HDR_FILES} ${HDR_MY_FUNCTIONS} ${HDR_LJM2} )
+  add_executable ( LJM2Tab ${SRC_FILES} ${SRC_MY_FUNCTIONS} ${SRC_LJM2} ${HDR_FILES} ${HDR_MY_FUNCTIONS} ${HDR_LJM2} ${SRC_JT} ${HDR_JT})
   target_link_libraries( LJM2Tab ${PCL_LIBRARIES}
 								  ${GRIP_LIBRARIES} 
 								  ${DART_LIBRARIES} 

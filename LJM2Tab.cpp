@@ -18,6 +18,7 @@
 #include <Tabs/AllTabs.h>
 #include <GRIPApp.h>
 
+#include "JTFollower/JTFollower.h"
 #include "LJM2Tab.h"
 
 using namespace std;
@@ -41,7 +42,7 @@ enum LJM2TabEvents {
 	button_PlotDebug,
 
 	button_Plan,
-	button_Stop,
+	button_Follow,
 	button_UpdateTime,
 	button_ExportSequence,
 	button_ShowPath,
@@ -184,7 +185,7 @@ LJM2Tab::LJM2Tab( wxWindow *parent, const wxWindowID id,
 	 		  1, // stretch to fit horizontally
 			  wxGROW ); // let it hog all the space in it's column
 
-    executeBoxSizer->Add( new wxButton(this, button_Stop, wxT("&Stop")),
+    executeBoxSizer->Add( new wxButton(this, button_Follow, wxT("&Follow")),
 			  1, // stretch to fit horizontally
 			  wxGROW );
 
@@ -247,7 +248,7 @@ Eigen::VectorXi LJM2Tab::GetLeftArmIds() {
  * @function setTimeLine
  * @brief 
  */
-void LJM2Tab::SetTimeline( std::list<Eigen::VectorXd> _path ) {
+void LJM2Tab::SetTimeline( std::vector<Eigen::VectorXd> _path ) {
     
     if( mWorld == NULL || _path.size() == 0 ) {
         std::cout << "--(!) Must create a valid plan before updating its duration (!)--" << std::endl;
@@ -267,10 +268,9 @@ void LJM2Tab::SetTimeline( std::list<Eigen::VectorXd> _path ) {
 
     Eigen::VectorXd vals( mLinks.size() );
 
-    for( std::list<Eigen::VectorXd>::iterator it = _path.begin(); it != _path.end(); it++ ) {
-
-        mWorld->mRobots[mRobotId]->setDofs( *it, mLinks );
-	      mWorld->mRobots[mRobotId]->update();
+	for( size_t i = 0; i < numsteps; ++i ) {
+        mWorld->mRobots[mRobotId]->setDofs( _path[i], mLinks );
+	    mWorld->mRobots[mRobotId]->update();
 
         frame->AddWorld( mWorld );
     }
@@ -440,9 +440,28 @@ void LJM2Tab::OnButton(wxCommandEvent &evt) {
 		  }
 		  break;
 
+        /** Execute Follow */
+		  case button_Follow: {
+		  	FollowWorkspacePlan();
+			SetTimeline( mConfigPaths[0] );
+		  }
+		  break;
+
     } // end of switch
 }
 
+/**
+ * @function FollowWorkspacePlan
+ */
+void LJM2Tab::FollowWorkspacePlan() {
+
+ 	mConfigPaths.resize(0);
+	JTFollower jt( *mWorld, mCollision, false );	
+ 	for( size_t i = 0; i < mWorkspacePaths.size(); ++i ) {
+		std::vector< Eigen::VectorXd > configPath = jt.PlanPath( mRobotId, mLinks, mStartConfig, mWorkspacePaths[i] );
+		mConfigPaths.push_back( configPath );
+ 	}
+}
 
 /**
  * @function WorkspacePlan
@@ -481,6 +500,7 @@ void LJM2Tab::WorkspacePlan() {
 	mWorkspacePaths = mLjm2->NodePathToWorkspacePath( mNodePaths );
 	printf("-------(i) Finished Workpace Planning (i)------- \n");
 }
+
 
 /*
  * @function GetEE_XYZ
